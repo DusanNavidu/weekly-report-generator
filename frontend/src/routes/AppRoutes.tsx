@@ -15,6 +15,7 @@ const Projects = lazy(() => import("../pages/manager/Projects"));
 // Team Member Pages
 const MyReports = lazy(() => import("../pages/member/MyReports"));
 const CreateReport = lazy(() => import("../pages/member/CreateReport"));
+const ReportDetail = lazy(() => import("../pages/member/ReportDetail"));
 
 type RequireAuthTypes = { children: ReactNode; roles?: string[] };
 
@@ -97,7 +98,7 @@ export default function AppRoutes() {
             <Route index element={<Navigate to="reports" replace />} />
             <Route path="reports" element={<MyReports />} />
             <Route path="reports/new" element={<CreateReport />} />
-            <Route path="reports/:id" element={<div className="p-10 text-white text-center">Edit/View Report Page Coming Soon</div>} />
+            <Route path="reports/:id" element={<ReportDetail />} />
           </Route>
 
         </Routes>
