@@ -1,15 +1,20 @@
 import { lazy, Suspense, ReactNode } from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { motion } from "framer-motion";
 import ManagerLayout from "../components/layout/ManagerLayout";
+import MemberLayout from "../components/layout/MemberLayout";
 
+// --- Lazy Loaded Components ---
 const Login = lazy(() => import("../pages/Login"));
+
+// Manager Pages
 const ManagerDashboard = lazy(() => import("../pages/manager/Dashboard"));
 const TeamMembers = lazy(() => import("../pages/manager/TeamMembers"));
 const Projects = lazy(() => import("../pages/manager/Projects"));
 
-const MemberReports = () => <div className="p-10 text-text-main text-2xl">Team Member Reports</div>;
+// Team Member Pages
+const MyReports = lazy(() => import("../pages/member/MyReports"));
+const CreateReport = lazy(() => import("../pages/member/CreateReport"));
 
 type RequireAuthTypes = { children: ReactNode; roles?: string[] };
 
@@ -61,7 +66,9 @@ export default function AppRoutes() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           
-          {/* Manager Routes with Layout */}
+          {/* ============================== */}
+          {/* MANAGER ROUTES                 */}
+          {/* ============================== */}
           <Route 
             path="/manager" 
             element={
@@ -70,11 +77,29 @@ export default function AppRoutes() {
               </RequireAuth>
             }
           >
+            <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<ManagerDashboard />} />
             <Route path="members" element={<TeamMembers />} />
             <Route path="projects" element={<Projects />} />
-            {/* <Route path="reports" element={<ManagerReports />} /> */}
           </Route>
+
+          {/* ============================== */}
+          {/* TEAM MEMBER ROUTES             */}
+          {/* ============================== */}
+          <Route 
+            path="/member" 
+            element={
+              <RequireAuth roles={["TEAM_MEMBER"]}>
+                <MemberLayout />
+              </RequireAuth>
+            }
+          >
+            <Route index element={<Navigate to="reports" replace />} />
+            <Route path="reports" element={<MyReports />} />
+            <Route path="reports/new" element={<CreateReport />} />
+            <Route path="reports/:id" element={<div className="p-10 text-white text-center">Edit/View Report Page Coming Soon</div>} />
+          </Route>
+
         </Routes>
       </Suspense>
     </BrowserRouter>

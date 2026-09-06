@@ -20,7 +20,6 @@ export default function ManagerLayout() {
     { name: "Reports", path: "/manager/reports", icon: FileText },
   ];
 
-  // Route එක මාරු වෙද්දී Mobile Menu එක Auto Close වීම
   useEffect(() => {
     setIsMobileOpen(false);
   }, [location.pathname]);

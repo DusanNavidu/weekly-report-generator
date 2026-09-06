@@ -5,5 +5,9 @@ package com.sisenco.backend.model;
  * @date 9/6/2026
  */
 
-public class ReportStatus {
+public enum ReportStatus {
+    DRAFT,
+    SUBMITTED,
+    NEEDS_CORRECTION,
+    APPROVED
 }
