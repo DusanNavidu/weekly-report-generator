@@ -1,5 +1,6 @@
 package com.sisenco.backend.service.impl;
 
+import com.sisenco.backend.dto.DashboardStatsDto;
 import com.sisenco.backend.dto.PaginatedData;
 import com.sisenco.backend.dto.ReportRequestDto;
 import com.sisenco.backend.dto.ReviewRequestDto;
@@ -16,6 +17,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Dusan
@@ -157,5 +160,32 @@ public class ReportServiceImpl implements ReportService {
         existingReport.setUpdatedAt(new Date());
 
         return reportRepository.save(existingReport);
+    }
+
+    @Override
+    public DashboardStatsDto getDashboardStats() {
+        DashboardStatsDto stats = new DashboardStatsDto();
+
+        stats.setTotalMembers(userRepository.findAll().stream()
+                .filter(u -> "TEAM_MEMBER".equals(u.getRole()))
+                .count());
+
+        stats.setActiveProjects(10);
+
+        long totalReports = reportRepository.count();
+        long pendingReviews = reportRepository.countByStatus(ReportStatus.SUBMITTED);
+
+        stats.setReportsThisWeek(totalReports);
+        stats.setPendingReviews(pendingReviews);
+
+        Map<String, Long> distribution = new HashMap<>();
+        distribution.put("DRAFT", reportRepository.countByStatus(ReportStatus.DRAFT));
+        distribution.put("SUBMITTED", pendingReviews);
+        distribution.put("NEEDS_CORRECTION", reportRepository.countByStatus(ReportStatus.NEEDS_CORRECTION));
+        distribution.put("APPROVED", reportRepository.countByStatus(ReportStatus.APPROVED));
+
+        stats.setReportStatusDistribution(distribution);
+
+        return stats;
     }
 }

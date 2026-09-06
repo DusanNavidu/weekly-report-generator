@@ -1,9 +1,6 @@
 package com.sisenco.backend.controller;
 
-import com.sisenco.backend.dto.ApiResponse;
-import com.sisenco.backend.dto.PaginatedData;
-import com.sisenco.backend.dto.ReportRequestDto;
-import com.sisenco.backend.dto.ReviewRequestDto;
+import com.sisenco.backend.dto.*;
 import com.sisenco.backend.model.Report;
 import com.sisenco.backend.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -83,5 +80,12 @@ public class ReportController {
 
         Report report = reportService.reviewReport(id, dto);
         return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", report));
+    }
+
+    @GetMapping("/dashboard-stats")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<ApiResponse<DashboardStatsDto>> getDashboardStats() {
+        DashboardStatsDto stats = reportService.getDashboardStats();
+        return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", stats));
     }
 }

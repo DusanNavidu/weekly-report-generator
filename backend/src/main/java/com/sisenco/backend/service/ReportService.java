@@ -1,5 +1,6 @@
 package com.sisenco.backend.service;
 
+import com.sisenco.backend.dto.DashboardStatsDto;
 import com.sisenco.backend.dto.PaginatedData;
 import com.sisenco.backend.dto.ReportRequestDto;
 import com.sisenco.backend.dto.ReviewRequestDto;
@@ -18,4 +19,5 @@ public interface ReportService {
     Report getReportById(String id);
     PaginatedData<Report> getAllReportsForManager(int page, int size);
     Report reviewReport(String reportId, ReviewRequestDto dto);
+    DashboardStatsDto getDashboardStats();
 }
