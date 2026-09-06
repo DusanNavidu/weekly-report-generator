@@ -21,9 +21,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project createProject(Project project) {
-        if (projectRepository.existsByName(project.getName())) {
+        if (projectRepository.existsByNameAndIsActiveTrue(project.getName())) {
             throw new RuntimeException("Project name already exists!");
         }
+        project.setActive(true);
         return projectRepository.save(project);
     }
 

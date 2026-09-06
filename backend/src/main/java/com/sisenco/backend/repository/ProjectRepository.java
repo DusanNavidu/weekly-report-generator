@@ -13,6 +13,6 @@ import java.util.List;
 
 @Repository
 public interface ProjectRepository extends MongoRepository<Project, String> {
-    boolean existsByName(String name);
+    boolean existsByNameAndIsActiveTrue(String name);
     List<Project> findByIsActiveTrue();
 }

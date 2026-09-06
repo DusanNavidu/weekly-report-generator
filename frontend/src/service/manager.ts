@@ -24,3 +24,8 @@ export const addTeamMember = async (userData: UserDTO) => {
   const response = await api.post('/users/add-member', userData);
   return response.data.data;
 };
+
+export const removeTeamMember = async (id: string) => {
+  const response = await api.delete(`/users/${id}`);
+  return response.data;
+};

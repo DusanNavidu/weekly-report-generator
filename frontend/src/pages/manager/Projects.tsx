@@ -1,19 +1,29 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FolderPlus, FolderKanban, Calendar } from "lucide-react";
+import { FolderPlus, FolderKanban, Calendar, Edit2, Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
-import { fetchProjects } from "../../store/slices/projectSlice";
+import { fetchProjects, deleteProject, Project } from "../../store/slices/projectSlice";
 import Modal from "../../components/ui/Modal";
 import AddProjectForm from "../../components/manager/AddProjectForm";
+import EditProjectForm from "../../components/manager/EditProjectForm";
+import ProjectCard from "../../components/manager/ProjectCard";
 
 export default function Projects() {
   const dispatch = useAppDispatch();
   const { projects, loading } = useAppSelector((state) => state.projects);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   useEffect(() => {
     dispatch(fetchProjects());
   }, [dispatch]);
+
+  const handleDelete = async (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to remove project "${name}"?`)) {
+      dispatch(deleteProject(id));
+    }
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
@@ -25,7 +35,7 @@ export default function Projects() {
         </div>
         
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => setIsAddModalOpen(true)}
           className="clay-btn px-6 py-3 flex items-center justify-center gap-2 font-semibold"
         >
           <FolderPlus size={20} />
@@ -33,7 +43,7 @@ export default function Projects() {
         </button>
       </div>
 
-      <div className="clay-card p-6 lg:p-8 min-h-[400px]">
+      <div className="clay-card p-6 lg:p-8 min-h-100">
         {loading && projects.length === 0 ? (
           <div className="flex justify-center items-center h-40">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -46,34 +56,32 @@ export default function Projects() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {projects.map((project, index) => (
-              <motion.div 
+              <ProjectCard 
                 key={project.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-background/50 p-6 rounded-2xl border border-border/50 shadow-inner flex flex-col h-full"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2.5 bg-primary/10 text-primary rounded-xl clay-card">
-                    <FolderKanban size={20} />
-                  </div>
-                  <h3 className="font-bold text-lg text-text-main truncate text-clay">{project.name}</h3>
-                </div>
-                <p className="text-sm text-text-muted font-medium mb-6 flex-1">
-                  {project.description}
-                </p>
-                <div className="flex items-center gap-2 text-xs font-bold text-text-muted/70 pt-4 border-t border-border/50">
-                  <Calendar size={14} />
-                  <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
-                </div>
-              </motion.div>
+                project={project}
+                index={index}
+                onEdit={setEditingProject}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Project">
-        <AddProjectForm onSuccess={() => setIsModalOpen(false)} />
+      {/* Add Project Modal */}
+      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Create New Project">
+        <AddProjectForm onSuccess={() => setIsAddModalOpen(false)} />
+      </Modal>
+
+      {/* Edit Project Modal */}
+      <Modal isOpen={!!editingProject} onClose={() => setEditingProject(null)} title="Edit Project">
+        {editingProject && (
+          <EditProjectForm 
+            project={editingProject} 
+            onSuccess={() => setEditingProject(null)} 
+            onCancel={() => setEditingProject(null)} 
+          />
+        )}
       </Modal>
 
     </motion.div>

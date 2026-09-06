@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Mail, ShieldAlert } from "lucide-react";
+import { Mail, ShieldAlert, Trash2 } from "lucide-react";
 import Pagination from "../ui/Pagination";
 import { UserDTO, PaginatedResponse } from "../../service/manager";
 
@@ -7,9 +7,10 @@ interface TeamTableProps {
   data: PaginatedResponse<UserDTO>;
   page: number;
   setPage: (page: number) => void;
+  onRemove: (id: string, name: string) => void;
 }
 
-export default function TeamTable({ data, page, setPage }: TeamTableProps) {
+export default function TeamTable({ data, page, setPage, onRemove }: TeamTableProps) {
   return (
     <div className="clay-card p-6 lg:p-8 flex flex-col h-full w-full">
       <div className="flex justify-between items-center mb-6">
@@ -44,8 +45,20 @@ export default function TeamTable({ data, page, setPage }: TeamTableProps) {
                   </div>
                 </div>
               </div>
-              <div className="hidden sm:flex px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold items-center gap-1">
-                <ShieldAlert size={12} /> {member.role.replace("_", " ")}
+              
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:flex px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold items-center gap-1">
+                  <ShieldAlert size={12} /> {member.role.replace("_", " ")}
+                </div>
+                
+                {/* Delete Button (Hover to reveal) */}
+                <button
+                  onClick={() => onRemove(member.id!, member.fullName)}
+                  title="Remove Member"
+                  className="p-2 text-error bg-error/10 rounded-xl hover:bg-error hover:text-white transition-colors opacity-0 group-hover:opacity-100"
+                >
+                  <Trash2 size={18} />
+                </button>
               </div>
             </motion.div>
           ))

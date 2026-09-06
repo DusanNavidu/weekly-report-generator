@@ -1,6 +1,7 @@
 package com.sisenco.backend.controller;
 
 import com.sisenco.backend.dto.ApiResponse;
+import com.sisenco.backend.dto.ProjectRequestDto;
 import com.sisenco.backend.model.Project;
 import com.sisenco.backend.service.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,11 @@ public class ProjectController {
 
     @PostMapping
     @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<ApiResponse<Project>> createProject(@RequestBody Project project) {
+    public ResponseEntity<ApiResponse<Project>> createProject(@RequestBody ProjectRequestDto dto) {
+        Project project = new Project();
+        project.setName(dto.getName());
+        project.setDescription(dto.getDescription());
+
         Project savedProject = projectService.createProject(project);
         return new ResponseEntity<>(new ApiResponse<>(201, "SUCCESS", savedProject), HttpStatus.CREATED);
     }
@@ -39,8 +44,12 @@ public class ProjectController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
-    public ResponseEntity<ApiResponse<Project>> updateProject(@PathVariable String id, @RequestBody Project project) {
-        Project updatedProject = projectService.updateProject(id, project);
+    public ResponseEntity<ApiResponse<Project>> updateProject(@PathVariable String id, @RequestBody ProjectRequestDto dto) {
+        Project projectDetails = new Project();
+        projectDetails.setName(dto.getName());
+        projectDetails.setDescription(dto.getDescription());
+
+        Project updatedProject = projectService.updateProject(id, projectDetails);
         return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", updatedProject));
     }
 

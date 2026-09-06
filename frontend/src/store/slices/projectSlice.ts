@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../service/api';
 
-interface Project {
+export interface Project {
   id: string;
   name: string;
   description: string;
@@ -30,6 +30,16 @@ export const createProject = createAsyncThunk('projects/createProject', async (p
   return response.data.data;
 });
 
+export const updateProject = createAsyncThunk('projects/updateProject', async ({ id, data }: { id: string; data: { name: string; description: string } }) => {
+  const response = await api.put(`/projects/${id}`, data);
+  return response.data.data;
+});
+
+export const deleteProject = createAsyncThunk('projects/deleteProject', async (id: string) => {
+  await api.delete(`/projects/${id}`);
+  return id;
+});
+
 const projectSlice = createSlice({
   name: 'projects',
   initialState,
@@ -37,6 +47,7 @@ const projectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Fetch Projects
       .addCase(fetchProjects.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -49,8 +60,23 @@ const projectSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch projects';
       })
+
+      // Create Project
       .addCase(createProject.fulfilled, (state, action) => {
         state.projects.push(action.payload);
+      })
+
+      // Update Project
+      .addCase(updateProject.fulfilled, (state, action) => {
+        const index = state.projects.findIndex((p) => p.id === action.payload.id);
+        if (index !== -1) {
+          state.projects[index] = action.payload;
+        }
+      })
+
+      // Delete Project
+      .addCase(deleteProject.fulfilled, (state, action) => {
+        state.projects = state.projects.filter((p) => p.id !== action.payload); // Delete වුණු project එක array එකෙන් අයින් කිරීම
       });
   },
 });

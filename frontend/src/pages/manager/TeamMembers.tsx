@@ -5,6 +5,7 @@ import { getTeamMembers, UserDTO, PaginatedResponse } from "../../service/manage
 import Modal from "../../components/ui/Modal";
 import AddMemberForm from "../../components/manager/AddMemberForm";
 import TeamTable from "../../components/manager/TeamTable";
+import { removeTeamMember } from "../../service/manager";
 
 export default function TeamMembers() {
 
@@ -33,6 +34,17 @@ export default function TeamMembers() {
         fetchMembers(0); // Refresh data
     };
 
+    const handleRemoveMember = async (id: string, name: string) => {
+    if (window.confirm(`Are you sure you want to remove ${name} from the team?`)) {
+      try {
+        await removeTeamMember(id);
+        fetchMembers(page);
+      } catch (error) {
+        console.error("Failed to remove member", error);
+      }
+    }
+  };
+
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
 
@@ -54,7 +66,7 @@ export default function TeamMembers() {
             </div>
 
             {/* Main Table Component */}
-            <TeamTable data={data} page={page} setPage={setPage} />
+            <TeamTable data={data} page={page} setPage={setPage} onRemove={handleRemoveMember} />
 
             {/* Popup Modal for Adding Member */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Add New Member">

@@ -42,6 +42,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
             userRepository.save(defaultManager);
             System.out.println("Default Manager created successfully! Email: " + adminEmail);
+        } else {
+            System.out.println("Default Manager already exists. Skipping creation.");
         }
     }
 }
