@@ -18,4 +18,6 @@ public class User {
     private String email;
     private String password;
     private Role role; // TEAM_MEMBER or MANAGER
+
+    private boolean isActive = true;
 }

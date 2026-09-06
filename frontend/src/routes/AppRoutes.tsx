@@ -1,11 +1,14 @@
 import { lazy, Suspense, ReactNode } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
+import ManagerLayout from "../components/layout/ManagerLayout";
 
 const Login = lazy(() => import("../pages/Login"));
+const ManagerDashboard = lazy(() => import("../pages/manager/Dashboard"));
+const TeamMembers = lazy(() => import("../pages/manager/TeamMembers"));
+const Projects = lazy(() => import("../pages/manager/Projects"));
 
-const ManagerDashboard = () => <div className="p-10 text-text-main text-2xl">Manager Dashboard</div>;
 const MemberReports = () => <div className="p-10 text-text-main text-2xl">Team Member Reports</div>;
 
 type RequireAuthTypes = { children: ReactNode; roles?: string[] };
@@ -58,19 +61,20 @@ export default function AppRoutes() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           
-          {/* Manager Only Routes */}
-          <Route path="/manager/dashboard" element={
-            <RequireAuth roles={["MANAGER"]}>
-              <ManagerDashboard />
-            </RequireAuth>
-          } />
-
-          {/* Team Member Only Routes */}
-          <Route path="/member/reports" element={
-            <RequireAuth roles={["TEAM_MEMBER"]}>
-              <MemberReports />
-            </RequireAuth>
-          } />
+          {/* Manager Routes with Layout */}
+          <Route 
+            path="/manager" 
+            element={
+              <RequireAuth roles={["MANAGER"]}>
+                <ManagerLayout />
+              </RequireAuth>
+            }
+          >
+            <Route path="dashboard" element={<ManagerDashboard />} />
+            <Route path="members" element={<TeamMembers />} />
+            <Route path="projects" element={<Projects />} />
+            {/* <Route path="reports" element={<ManagerReports />} /> */}
+          </Route>
         </Routes>
       </Suspense>
     </BrowserRouter>

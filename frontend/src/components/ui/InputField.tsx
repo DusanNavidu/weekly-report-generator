@@ -13,23 +13,18 @@ export default function InputField({ label, error, type = "text", id, ...props }
 
   return (
     <div className="flex flex-col gap-1.5 w-full mb-4">
-      {/* Label Component */}
-      <label htmlFor={id} className="text-sm font-medium text-text-main">
+      <label htmlFor={id} className="text-sm font-semibold text-text-main pl-1">
         {label}
       </label>
 
-      {/* Input Wrapper */}
       <div className="relative">
         <input
           id={id}
           type={inputType}
-          className={`w-full px-4 py-2.5 rounded-lg border bg-surface text-text-main focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
-            error ? "border-error focus:ring-error" : "border-border"
-          }`}
+          className={`clay-input w-full px-4 py-3 text-text-main ${error ? "border-error focus:ring-error" : ""}`}
           {...props}
         />
 
-        {/* Eye Toggle Component */}
         {isPassword && (
           <button
             type="button"
@@ -41,8 +36,7 @@ export default function InputField({ label, error, type = "text", id, ...props }
         )}
       </div>
 
-      {/* Error Message Component */}
-      {error && <span className="text-xs font-medium text-error">{error}</span>}
+      {error && <span className="text-xs font-medium text-error pl-1">{error}</span>}
     </div>
   );
 }

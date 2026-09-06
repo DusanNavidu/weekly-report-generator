@@ -1,9 +1,6 @@
 package com.sisenco.backend.controller;
 
-import com.sisenco.backend.dto.ApiResponse;
-import com.sisenco.backend.dto.AuthResponse;
-import com.sisenco.backend.dto.LoginRequest;
-import com.sisenco.backend.dto.RefreshTokenRequest;
+import com.sisenco.backend.dto.*;
 import com.sisenco.backend.model.User;
 import com.sisenco.backend.service.UserService;
 import com.sisenco.backend.util.JwtUtil;
@@ -29,8 +26,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<User>> register(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
+    public ResponseEntity<ApiResponse<UserResponseDto>> register(@RequestBody User user) {
+        UserResponseDto registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(new ApiResponse<>(201, "SUCCESS", registeredUser), HttpStatus.CREATED);
     }
 
