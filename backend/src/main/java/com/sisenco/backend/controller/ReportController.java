@@ -3,6 +3,7 @@ package com.sisenco.backend.controller;
 import com.sisenco.backend.dto.ApiResponse;
 import com.sisenco.backend.dto.PaginatedData;
 import com.sisenco.backend.dto.ReportRequestDto;
+import com.sisenco.backend.dto.ReviewRequestDto;
 import com.sisenco.backend.model.Report;
 import com.sisenco.backend.service.ReportService;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +55,33 @@ public class ReportController {
     @PreAuthorize("hasAnyRole('MANAGER', 'TEAM_MEMBER')")
     public ResponseEntity<ApiResponse<Report>> getReportById(@PathVariable String id) {
         Report report = reportService.getReportById(id);
+        return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", report));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('TEAM_MEMBER')")
+    public ResponseEntity<ApiResponse<String>> deleteReport(@PathVariable String id, Principal principal) {
+        reportService.deleteReport(id, principal.getName());
+        return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", "Report deleted successfully"));
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<ApiResponse<PaginatedData<Report>>> getAllReportsForManager(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PaginatedData<Report> reports = reportService.getAllReportsForManager(page, size);
+        return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", reports));
+    }
+
+    @PutMapping("/{id}/review")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<ApiResponse<Report>> reviewReport(
+            @PathVariable String id,
+            @RequestBody ReviewRequestDto dto) {
+
+        Report report = reportService.reviewReport(id, dto);
         return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", report));
     }
 }

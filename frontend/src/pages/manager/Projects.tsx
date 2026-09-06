@@ -7,9 +7,11 @@ import Modal from "../../components/ui/Modal";
 import AddProjectForm from "../../components/manager/AddProjectForm";
 import EditProjectForm from "../../components/manager/EditProjectForm";
 import ProjectCard from "../../components/manager/ProjectCard";
+import { useAlert } from "../../hooks/useAlert";
 
 export default function Projects() {
   const dispatch = useAppDispatch();
+  const alert = useAlert();
   const { projects, loading } = useAppSelector((state) => state.projects);
   
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -20,9 +22,30 @@ export default function Projects() {
   }, [dispatch]);
 
   const handleDelete = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to remove project "${name}"?`)) {
-      dispatch(deleteProject(id));
+    const isConfirmed = await alert.confirmAction(
+      "Are you sure?",
+      `Do you really want to delete the project "${name}"? This action cannot be undone.`,
+      "Yes, Delete it!"
+    );
+
+    if (isConfirmed) {
+      try {
+        await dispatch(deleteProject(id)).unwrap();
+        alert.toast("Project deleted successfully!", "success");
+      } catch (err) {
+        alert.showError("Failed to delete", "Something went wrong. Please try again.");
+      }
     }
+  };
+
+  const handleAddSuccess = () => {
+    setIsAddModalOpen(false);
+    alert.toast("Project created successfully!", "success");
+  };
+
+  const handleEditSuccess = () => {
+    setEditingProject(null);
+    alert.toast("Project updated successfully!", "success");
   };
 
   return (
@@ -70,7 +93,7 @@ export default function Projects() {
 
       {/* Add Project Modal */}
       <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Create New Project">
-        <AddProjectForm onSuccess={() => setIsAddModalOpen(false)} />
+        <AddProjectForm onSuccess={handleAddSuccess} />
       </Modal>
 
       {/* Edit Project Modal */}
@@ -78,7 +101,7 @@ export default function Projects() {
         {editingProject && (
           <EditProjectForm 
             project={editingProject} 
-            onSuccess={() => setEditingProject(null)} 
+            onSuccess={handleEditSuccess} 
             onCancel={() => setEditingProject(null)} 
           />
         )}

@@ -6,9 +6,11 @@ import Modal from "../../components/ui/Modal";
 import AddMemberForm from "../../components/manager/AddMemberForm";
 import TeamTable from "../../components/manager/TeamTable";
 import { removeTeamMember } from "../../service/manager";
+import { useAlert } from "../../hooks/useAlert";
 
 export default function TeamMembers() {
-
+    
+    const alert = useAlert();
     const [data, setData] = useState<PaginatedResponse<UserDTO>>({
         content: [], currentPage: 0, totalPages: 0, totalElements: 0
     });
@@ -32,15 +34,17 @@ export default function TeamMembers() {
         setIsModalOpen(false); // Close Modal
         setPage(0); // Go to first page
         fetchMembers(0); // Refresh data
+        alert.toast("Member added successfully!", "success");
     };
 
     const handleRemoveMember = async (id: string, name: string) => {
     if (window.confirm(`Are you sure you want to remove ${name} from the team?`)) {
       try {
         await removeTeamMember(id);
+        alert.toast("Member removed successfully!", "success");
         fetchMembers(page);
       } catch (error) {
-        console.error("Failed to remove member", error);
+        alert.showError("Failed to remove member", "Something went wrong. Please try again.");
       }
     }
   };

@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, Outlet } from "react-router-dom
 import { useAuth } from "../context/AuthContext";
 import ManagerLayout from "../components/layout/ManagerLayout";
 import MemberLayout from "../components/layout/MemberLayout";
+import { motion } from "framer-motion";
 
 // --- Lazy Loaded Components ---
 const Login = lazy(() => import("../pages/Login"));
@@ -11,6 +12,9 @@ const Login = lazy(() => import("../pages/Login"));
 const ManagerDashboard = lazy(() => import("../pages/manager/Dashboard"));
 const TeamMembers = lazy(() => import("../pages/manager/TeamMembers"));
 const Projects = lazy(() => import("../pages/manager/Projects"));
+const ManagerReports = lazy(() => import("../pages/manager/ManagerReports"));
+const ReportReview = lazy(() => import("../pages/manager/ReportReview"));
+
 
 // Team Member Pages
 const MyReports = lazy(() => import("../pages/member/MyReports"));
@@ -24,23 +28,34 @@ const RequireAuth = ({ children, roles }: RequireAuthTypes) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-background overflow-hidden relative">
-        <div className="absolute w-125 h-125 bg-primary/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div className="relative flex items-center justify-center">
-          <div className="w-24 h-24 border-t-4 border-b-4 border-primary rounded-full animate-spin"></div>
-          <div className="absolute w-16 h-16 border-r-4 border-l-4 border-primary/60 rounded-full animate-spin-reverse opacity-70"></div>
-          <div className="absolute bg-text-main w-4 h-4 rounded-full shadow-lg animate-ping"></div>
-        </div>
-        <div className="mt-10 text-center z-10">
-          <h2 className="text-text-main text-2xl font-black italic tracking-[0.2em] uppercase animate-pulse">
-            SISENCO <span className="text-primary">REPORTS</span>
-          </h2>
-          <div className="flex items-center justify-center gap-1 mt-2">
-            <span className="text-[10px] font-bold text-text-muted uppercase tracking-widest">
-              Authenticating Workspace
-            </span>
+      <div className="flex flex-col items-center justify-center h-screen bg-background text-text-main transition-colors duration-300">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+          className="clay-card w-28 h-28 flex items-center justify-center rounded-4xl shadow-xl"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-3xl shadow-inner">
+            S
           </div>
-        </div>
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-8 flex flex-col items-center"
+        >
+          <h2 className="text-2xl font-bold tracking-wide">
+            Sisenco<span className="text-primary font-black">Reports</span>
+          </h2>
+          <div className="flex items-center gap-2 mt-3">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+          </div>
+          <p className="text-sm font-medium text-text-muted mt-2">Authenticating Workspace...</p>
+        </motion.div>
       </div>
     );
   }
@@ -49,9 +64,12 @@ const RequireAuth = ({ children, roles }: RequireAuthTypes) => {
 
   if (roles && !roles.includes(user.role)) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-background text-text-main">
-        <h2 className="text-3xl font-bold mb-2 text-error">Access Denied</h2>
-        <p className="text-text-muted">You do not have permission to view this page.</p>
+      <div className="flex flex-col items-center justify-center h-screen bg-background text-text-main transition-colors duration-300">
+        <div className="clay-card p-10 flex flex-col items-center text-center">
+          <h2 className="text-4xl font-bold mb-4 text-error">403</h2>
+          <h3 className="text-2xl font-bold mb-2">Access Denied</h3>
+          <p className="text-text-muted font-medium">You do not have permission to view this workspace.</p>
+        </div>
       </div>
     );
   }
@@ -59,10 +77,14 @@ const RequireAuth = ({ children, roles }: RequireAuthTypes) => {
   return <>{children}</>;
 };
 
+const SuspenseLoader = () => (
+  <div className="h-screen w-full bg-background transition-colors duration-300"></div>
+);
+
 export default function AppRoutes() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Suspense fallback={<div className="h-screen bg-background"></div>}>
+      <Suspense fallback={<SuspenseLoader />}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
@@ -82,6 +104,8 @@ export default function AppRoutes() {
             <Route path="dashboard" element={<ManagerDashboard />} />
             <Route path="members" element={<TeamMembers />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="reports" element={<ManagerReports />} />
+            <Route path="reports/:id" element={<ReportReview />} />
           </Route>
 
           {/* ============================== */}

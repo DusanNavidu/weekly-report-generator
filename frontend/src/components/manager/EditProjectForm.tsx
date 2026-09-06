@@ -3,6 +3,7 @@ import { Edit2 } from "lucide-react";
 import InputField from "../ui/InputField";
 import { useAppDispatch } from "../../hooks/hooks";
 import { updateProject, Project } from "../../store/slices/projectSlice";
+import { useAlert } from "../../hooks/useAlert";
 
 interface EditProjectFormProps {
   project: Project;
@@ -14,6 +15,7 @@ export default function EditProjectForm({ project, onSuccess, onCancel }: EditPr
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description);
   const [isUpdating, setIsUpdating] = useState(false);
+  const alert = useAlert();
   
   const dispatch = useAppDispatch();
 
@@ -24,8 +26,9 @@ export default function EditProjectForm({ project, onSuccess, onCancel }: EditPr
     try {
       await dispatch(updateProject({ id: project.id, data: { name, description } })).unwrap();
       onSuccess();
+      alert.toast("Project updated successfully!", "success");
     } catch (err) {
-      console.error("Failed to update project", err);
+      alert.showError("Failed to update project", "Something went wrong. Please try again.");
     } finally {
       setIsUpdating(false);
     }

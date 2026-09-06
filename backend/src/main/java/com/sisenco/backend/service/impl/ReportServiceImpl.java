@@ -2,6 +2,7 @@ package com.sisenco.backend.service.impl;
 
 import com.sisenco.backend.dto.PaginatedData;
 import com.sisenco.backend.dto.ReportRequestDto;
+import com.sisenco.backend.dto.ReviewRequestDto;
 import com.sisenco.backend.model.Report;
 import com.sisenco.backend.model.ReportStatus;
 import com.sisenco.backend.model.User;
@@ -63,6 +64,10 @@ public class ReportServiceImpl implements ReportService {
             throw new RuntimeException("You are not authorized to edit this report");
         }
 
+        if (existingReport.getStatus() == ReportStatus.SUBMITTED || existingReport.getStatus() == ReportStatus.APPROVED) {
+            throw new RuntimeException("Cannot edit report. This report is currently " + existingReport.getStatus());
+        }
+
         existingReport.setProjectId(dto.getProjectId());
         existingReport.setWeekStartDate(dto.getWeekStartDate());
         existingReport.setWeekEndDate(dto.getWeekEndDate());
@@ -96,8 +101,61 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    public void deleteReport(String reportId, String userEmail) {
+        User user = getUserByEmail(userEmail);
+        Report existingReport = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        // 1. Authorization Validation
+        if (!existingReport.getUserId().equals(user.getId())) {
+            throw new RuntimeException("You are not authorized to delete this report");
+        }
+
+        // 2. Status Validation
+        if (existingReport.getStatus() != ReportStatus.DRAFT) {
+            throw new RuntimeException("Only reports in DRAFT status can be deleted.");
+        }
+
+        reportRepository.delete(existingReport);
+    }
+
+    @Override
     public Report getReportById(String id) {
         return reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
+    }
+
+    @Override
+    public PaginatedData<Report> getAllReportsForManager(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "updatedAt"));
+        Page<Report> reportPage = reportRepository.findAll(pageRequest);
+
+        return new PaginatedData<>(
+                reportPage.getContent(),
+                reportPage.getNumber(),
+                reportPage.getTotalPages(),
+                reportPage.getTotalElements()
+        );
+    }
+
+    @Override
+    public Report reviewReport(String reportId, ReviewRequestDto dto) {
+        Report existingReport = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        if (existingReport.getStatus() == ReportStatus.DRAFT) {
+            throw new RuntimeException("Cannot review a report that is still in DRAFT status.");
+        }
+
+        existingReport.setStatus(dto.getStatus());
+        existingReport.setLatestManagerComment(dto.getComment());
+
+        if (dto.getStatus() == ReportStatus.NEEDS_CORRECTION) {
+            existingReport.setCurrentVersion(existingReport.getCurrentVersion() + 1);
+        }
+
+        existingReport.setUpdatedAt(new Date());
+
+        return reportRepository.save(existingReport);
     }
 }

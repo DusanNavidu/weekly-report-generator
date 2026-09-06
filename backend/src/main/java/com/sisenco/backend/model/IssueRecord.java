@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IssueRecord {
     private String description;
-    private boolean isKeyIssue; // Indicates if this issue is a key issue
+    private Boolean isKeyIssue; // Indicates if this issue is a key issue
 }

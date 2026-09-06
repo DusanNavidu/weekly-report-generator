@@ -2,6 +2,7 @@ import { useState } from "react";
 import { UserPlus } from "lucide-react";
 import InputField from "../ui/InputField";
 import { addTeamMember } from "../../service/manager";
+import { useAlert } from "../../hooks/useAlert";
 
 interface AddMemberFormProps {
   onSuccess: () => void;
@@ -13,6 +14,7 @@ export default function AddMemberForm({ onSuccess }: AddMemberFormProps) {
   const [password, setPassword] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState("");
+  const alert = useAlert();
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,8 +27,9 @@ export default function AddMemberForm({ onSuccess }: AddMemberFormProps) {
       setEmail("");
       setPassword("");
       onSuccess();
+      alert.toast("Member added successfully!", "success");
     } catch (err) {
-      setError("Failed to add member. Email might be in use.");
+      alert.showError("Failed to add member", "Something went wrong. Please try again.");
       console.error(err);
     } finally {
       setIsAdding(false);

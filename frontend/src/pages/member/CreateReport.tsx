@@ -11,10 +11,12 @@ import PageHeader from "../../components/ui/PageHeader";
 import TasksSection from "../../components/member/TasksSection";
 import BlockersSection from "../../components/member/BlockersSection";
 import AchievementsSection from "../../components/member/AchievementsSection";
+import { useAlert } from "../../hooks/useAlert";
 
 export default function CreateReport() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const alert = useAlert();
   const { projects } = useAppSelector((state) => state.projects);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -29,10 +31,14 @@ export default function CreateReport() {
   useEffect(() => { dispatch(fetchProjects()); }, [dispatch]);
 
   const handleSave = async (isSubmit: boolean) => {
-    if (!projectId || !weekStartDate || !weekEndDate) return alert("Please fill in basic details.");
+    if (!projectId || !weekStartDate || !weekEndDate) {
+      alert.showError("Missing Information", "Please fill in all required fields before saving or submitting.");
+      return;
+    }
     setIsSubmitting(true);
     try {
       await dispatch(submitNewReport({ projectId, weekStartDate, weekEndDate, tasksCompleted: tasks, tasksPlannedForNextWeek: [], blockers, achievements, notes: "", isSubmit })).unwrap();
+      alert.toast("Report submitted successfully!", "success");
       navigate("/member/reports");
     } finally { setIsSubmitting(false); }
   };

@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AchievementRecord {
     private String description;
-    private boolean isKeyAchievement; // Indicates if this achievement is a key achievement
+    private Boolean isKeyAchievement; // Indicates if this achievement is a key achievement
 }

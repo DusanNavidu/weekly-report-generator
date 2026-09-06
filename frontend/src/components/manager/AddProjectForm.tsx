@@ -3,6 +3,7 @@ import { FolderPlus } from "lucide-react";
 import InputField from "../ui/InputField";
 import { useAppDispatch } from "../../hooks/hooks";
 import { createProject } from "../../store/slices/projectSlice";
+import { useAlert } from "../../hooks/useAlert";
 
 interface AddProjectFormProps {
   onSuccess: () => void;
@@ -12,6 +13,7 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isAdding, setIsAdding] = useState(false);
+  const alert = useAlert();
   
   const dispatch = useAppDispatch();
 
@@ -24,8 +26,9 @@ export default function AddProjectForm({ onSuccess }: AddProjectFormProps) {
       setName("");
       setDescription("");
       onSuccess();
+      alert.toast("Project added successfully!", "success");
     } catch (err) {
-      console.error("Failed to add project", err);
+      alert.showError("Failed to add project", "Something went wrong. Please try again.");
     } finally {
       setIsAdding(false);
     }

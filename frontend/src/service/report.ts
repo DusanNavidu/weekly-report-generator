@@ -42,6 +42,11 @@ export interface Report extends Omit<ReportRequestDto, 'isSubmit'> {
   updatedAt: string;
 }
 
+export interface ReviewRequestDto {
+  status: "APPROVED" | "NEEDS_CORRECTION";
+  comment: string;
+}
+
 export const createReportAPI = async (data: ReportRequestDto) => {
   const response = await api.post('/reports', data);
   return response.data.data as Report;
@@ -60,4 +65,19 @@ export const getMyReportsAPI = async (page: number = 0, size: number = 10) => {
 export const getReportByIdAPI = async (id: string) => {
   const response = await api.get(`/reports/${id}`);
   return response.data.data as Report;
+};
+
+export const deleteReportAPI = async (id: string) => {
+  const response = await api.delete(`/reports/${id}`);
+  return response.data;
+};
+
+export const getAllReportsForManagerAPI = async (page: number, size: number) => {
+  const response = await api.get(`/reports/all?page=${page}&size=${size}`);
+  return response.data.data;
+};
+
+export const reviewReportAPI = async (id: string, data: ReviewRequestDto) => {
+  const response = await api.put(`/reports/${id}/review`, data);
+  return response.data.data;
 };
