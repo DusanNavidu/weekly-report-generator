@@ -47,6 +47,14 @@ export interface ReviewRequestDto {
   comment: string;
 }
 
+export interface DashboardStatsDto {
+  totalMembers: number;
+  activeProjects: number;
+  reportsThisWeek: number;
+  pendingReviews: number;
+  reportStatusDistribution: Record<string, number>;
+}
+
 export const createReportAPI = async (data: ReportRequestDto) => {
   const response = await api.post('/reports', data);
   return response.data.data as Report;
@@ -79,5 +87,10 @@ export const getAllReportsForManagerAPI = async (page: number, size: number) => 
 
 export const reviewReportAPI = async (id: string, data: ReviewRequestDto) => {
   const response = await api.put(`/reports/${id}/review`, data);
+  return response.data.data;
+};
+
+export const getDashboardStatsAPI = async () => {
+  const response = await api.get('/reports/dashboard-stats');
   return response.data.data;
 };

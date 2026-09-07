@@ -1,60 +1,66 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, FolderOpen, FileCheck2, Clock } from "lucide-react";
+import { getDashboardStatsAPI, DashboardStatsDto } from "../../service/report";
+import { useAlert } from "../../hooks/useAlert";
+
+import PageHeader from "../../components/ui/PageHeader";
+import SummaryCards from "../../components/manager/SummaryCards";
+import StatusPieChart from "../../components/manager/StatusPieChart";
+import WorkflowBarChart from "../../components/manager/WorkflowBarChart";
 
 export default function ManagerDashboard() {
-  const stats = [
-    { title: "Total Members", value: "0", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-    { title: "Active Projects", value: "0", icon: FolderOpen, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-    { title: "Reports This Week", value: "0", icon: FileCheck2, color: "text-green-500", bg: "bg-green-500/10" },
-    { title: "Pending Reviews", value: "0", icon: Clock, color: "text-orange-500", bg: "bg-orange-500/10" },
-  ];
+  const [stats, setStats] = useState<DashboardStatsDto | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const alert = useAlert();
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  const loadStats = async () => {
+    try {
+      const data = await getDashboardStatsAPI();
+      setStats(data);
+    } catch (error) {
+      alert.showError("Error", "Could not load dashboard statistics.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const rawDist = stats?.reportStatusDistribution || {};
+  const chartData = [
+    { name: 'Draft', value: rawDist['DRAFT'] || 0, color: '#9ca3af' }, // Gray
+    { name: 'Pending Review', value: rawDist['SUBMITTED'] || 0, color: '#3b82f6' }, // Blue
+    { name: 'Needs Correction', value: rawDist['NEEDS_CORRECTION'] || 0, color: '#f59e0b' }, // Orange
+    { name: 'Approved', value: rawDist['APPROVED'] || 0, color: '#10b981' } // Green
+  ].filter(item => item.value > 0);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
-      <div>
-        <h1 className="text-3xl font-bold text-text-main text-clay">Dashboard Overview</h1>
-        <p className="text-text-muted mt-2 font-medium">Welcome back! Here is what's happening this week.</p>
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 max-w-7xl mx-auto">
+      
+      <PageHeader 
+        title="Dashboard Overview" 
+        description="Welcome back! Here is a summary of your team's weekly reporting activity." 
+      />
+
+      {/* 1. Summary Metric Cards */}
+      <SummaryCards stats={stats} />
+
+      {/* 2. Visual Insights & Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <StatusPieChart data={chartData} />
+        <WorkflowBarChart data={chartData} />
       </div>
 
-      {/* Stats Cards with Claymorphism */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="clay-card p-6 flex flex-col justify-center gap-4"
-            >
-              <div className="flex items-center gap-4">
-                {/* Embedded inner shadow box for icons */}
-                <div className={`p-4 rounded-2xl shadow-inner ${stat.bg} ${stat.color}`}>
-                  <Icon size={28} />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-text-muted">{stat.title}</p>
-                  <p className="text-3xl font-bold text-text-main mt-1 text-clay">{stat.value}</p>
-                </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Recent Activity with Claymorphism */}
-      <div className="clay-card p-8 mt-8">
-        <h2 className="text-xl font-bold text-text-main mb-6 text-clay">Recent Activity</h2>
-        <div className="flex flex-col items-center justify-center py-16 text-text-muted bg-background/50 rounded-2xl border border-border/50 inset-shadow-sm">
-          <FileCheck2 size={56} className="mb-4 opacity-20" />
-          <p className="font-medium">No activity yet. Let's start by adding some Team Members and Projects!</p>
-        </div>
-      </div>
     </motion.div>
   );
 }

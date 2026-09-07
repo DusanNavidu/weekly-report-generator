@@ -7,6 +7,7 @@ import com.sisenco.backend.dto.ReviewRequestDto;
 import com.sisenco.backend.model.Report;
 import com.sisenco.backend.model.ReportStatus;
 import com.sisenco.backend.model.User;
+import com.sisenco.backend.repository.ProjectRepository;
 import com.sisenco.backend.repository.ReportRepository;
 import com.sisenco.backend.repository.UserRepository;
 import com.sisenco.backend.service.ReportService;
@@ -31,6 +32,7 @@ public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -167,10 +169,10 @@ public class ReportServiceImpl implements ReportService {
         DashboardStatsDto stats = new DashboardStatsDto();
 
         stats.setTotalMembers(userRepository.findAll().stream()
-                .filter(u -> "TEAM_MEMBER".equals(u.getRole()))
+                .filter(u -> u.getRole() != null && "TEAM_MEMBER".equals(u.getRole().toString()))
                 .count());
 
-        stats.setActiveProjects(10);
+        stats.setActiveProjects(projectRepository.count());
 
         long totalReports = reportRepository.count();
         long pendingReviews = reportRepository.countByStatus(ReportStatus.SUBMITTED);

@@ -6,7 +6,8 @@ import { motion } from 'framer-motion';
 
 export default function MemberLayout() {
   const { logout, user } = useAuth();
-  const { isDark, toggleTheme } = useTheme(); 
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
   const navigate = useNavigate();
 
   const handleLogout = () => {

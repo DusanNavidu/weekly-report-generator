@@ -4,13 +4,14 @@ import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../hooks/useTheme";
 import { LayoutDashboard, Users, FolderOpen, FileText, LogOut, Menu, X, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import AIChatWidget from "../manager/AIChatWidget";
 
 export default function ManagerLayout() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false); // Desktop Sidebar Toggle
   
   const { user, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
   const navItems = [
@@ -145,7 +146,7 @@ export default function ManagerLayout() {
           
           <div className="flex items-center gap-2 sm:gap-4">
             <button onClick={toggleTheme} className="p-2.5 text-text-muted hover:text-primary rounded-full hover:bg-background transition-all">
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             
             <div className="flex items-center gap-3 pl-2 sm:pl-4 border-l border-border">
@@ -164,6 +165,9 @@ export default function ManagerLayout() {
         <main className="flex-1 overflow-y-auto bg-background lg:bg-surface lg:clay-card lg:rounded-3xl p-4 sm:p-6 lg:p-8 transition-colors">
           <Outlet />
         </main>
+
+        {/* AI Chat Widget */} 
+        <AIChatWidget />
       </div>
     </div>
   );
