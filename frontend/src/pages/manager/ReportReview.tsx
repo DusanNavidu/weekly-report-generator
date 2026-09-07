@@ -72,7 +72,7 @@ export default function ReportReview() {
         <div className="clay-card p-6 lg:p-8 border-l-4 border-primary">
           <h3 className="text-xl font-bold text-text-main mb-4">Manager Review</h3>
           <textarea
-            className="clay-input w-full p-4 min-h-[120px] mb-6"
+            className="clay-input w-full p-4 min-h-30 mb-6"
             placeholder="Add your feedback or correction notes here..."
             value={comment}
             onChange={(e) => setComment(e.target.value)}

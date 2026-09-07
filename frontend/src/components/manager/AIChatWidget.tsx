@@ -53,7 +53,7 @@ export default function AIChatWidget() {
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="clay-card w-[350px] sm:w-[400px] h-[500px] mb-4 flex flex-col overflow-hidden shadow-2xl"
+            className="clay-card w-87.5 sm:w-100 h-125 mb-4 flex flex-col overflow-hidden shadow-2xl"
           >
             {/* Header */}
             <div className="bg-primary p-4 flex justify-between items-center text-white">
