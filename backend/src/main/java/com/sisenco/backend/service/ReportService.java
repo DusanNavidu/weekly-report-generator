@@ -6,6 +6,8 @@ import com.sisenco.backend.dto.ReportRequestDto;
 import com.sisenco.backend.dto.ReviewRequestDto;
 import com.sisenco.backend.model.Report;
 
+import java.util.Map;
+
 /**
  * @author Dusan
  * @date 9/6/2026
@@ -20,4 +22,5 @@ public interface ReportService {
     PaginatedData<Report> getAllReportsForManager(int page, int size);
     Report reviewReport(String reportId, ReviewRequestDto dto);
     DashboardStatsDto getDashboardStats();
+    Map<String, Object> getTeamMemberProfile(String userId);
 }

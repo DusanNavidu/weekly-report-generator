@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dusan
@@ -46,4 +47,7 @@ public class Report {
 
     private Date createdAt = new Date();
     private Date updatedAt = new Date();
+
+    private List<String> commentHistory = new ArrayList<>();
+    private List<Map<String, Object>> previousVersions = new ArrayList<>();
 }

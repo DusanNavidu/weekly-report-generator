@@ -14,6 +14,8 @@ const TeamMembers = lazy(() => import("../pages/manager/TeamMembers"));
 const Projects = lazy(() => import("../pages/manager/Projects"));
 const ManagerReports = lazy(() => import("../pages/manager/ManagerReports"));
 const ReportReview = lazy(() => import("../pages/manager/ReportReview"));
+const TeamMemberProfile = lazy(() => import("../pages/manager/TeamMemberProfile"));
+const SideBySideCompare = lazy(() => import("../pages/manager/SideBySideCompare"));
 
 
 // Team Member Pages
@@ -103,9 +105,11 @@ export default function AppRoutes() {
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<ManagerDashboard />} />
             <Route path="members" element={<TeamMembers />} />
+            <Route path="members/:id" element={<TeamMemberProfile />} />
             <Route path="projects" element={<Projects />} />
             <Route path="reports" element={<ManagerReports />} />
             <Route path="reports/:id" element={<ReportReview />} />
+            <Route path="compare" element={<SideBySideCompare />} />
           </Route>
 
           {/* ============================== */}

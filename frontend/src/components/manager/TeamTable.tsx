@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { Mail, ShieldAlert, Trash2 } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Mail, ShieldAlert, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Pagination from "../ui/Pagination";
 import { UserDTO, PaginatedResponse } from "../../service/manager";
 
@@ -11,6 +12,8 @@ interface TeamTableProps {
 }
 
 export default function TeamTable({ data, page, setPage, onRemove }: TeamTableProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="clay-card p-6 lg:p-8 flex flex-col h-full w-full">
       <div className="flex justify-between items-center mb-6">
@@ -32,7 +35,7 @@ export default function TeamTable({ data, page, setPage, onRemove }: TeamTablePr
               animate={{ opacity: 1, x: 0 }} 
               transition={{ delay: index * 0.1 }}
               key={member.id} 
-              className="flex items-center justify-between p-4 bg-background/50 rounded-2xl border border-border/50 shadow-inner"
+              className="flex items-center justify-between p-4 bg-background/50 rounded-2xl border border-border/50 shadow-inner hover:bg-background/70 transition-colors group cursor-pointer"
             >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 clay-card flex items-center justify-center text-primary font-bold text-lg shrink-0">
@@ -47,6 +50,14 @@ export default function TeamTable({ data, page, setPage, onRemove }: TeamTablePr
               </div>
               
               <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate(`/manager/members/${member.id}`, { state: { member } })}
+                  title="View Profile"
+                  className="p-2 text-primary bg-primary/10 rounded-xl hover:bg-primary hover:text-white transition-colors"
+                >
+                  <ArrowBigRight size={18} />
+                </button>
+
                 <div className="hidden sm:flex px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-full text-xs font-bold items-center gap-1">
                   <ShieldAlert size={12} /> {member.role.replace("_", " ")}
                 </div>

@@ -17,9 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Dusan
@@ -73,6 +71,31 @@ public class ReportServiceImpl implements ReportService {
             throw new RuntimeException("Cannot edit report. This report is currently " + existingReport.getStatus());
         }
 
+        if (existingReport.getPreviousVersions() == null) {
+            existingReport.setPreviousVersions(new ArrayList<>());
+        }
+
+        Map<String, Object> oldVersion = new HashMap<>();
+        oldVersion.put("version", existingReport.getCurrentVersion());
+        oldVersion.put("status", existingReport.getStatus());
+
+        // Use new ArrayLists to prevent MongoDB references from updating the history when the current arrays change
+        oldVersion.put("tasksCompleted", existingReport.getTasksCompleted() != null ? new ArrayList<>(existingReport.getTasksCompleted()) : new ArrayList<>());
+        oldVersion.put("blockers", existingReport.getBlockers() != null ? new ArrayList<>(existingReport.getBlockers()) : new ArrayList<>());
+        oldVersion.put("achievements", existingReport.getAchievements() != null ? new ArrayList<>(existingReport.getAchievements()) : new ArrayList<>());
+
+        oldVersion.put("projectId", existingReport.getProjectId());
+        oldVersion.put("weekStartDate", existingReport.getWeekStartDate());
+        oldVersion.put("weekEndDate", existingReport.getWeekEndDate());
+        oldVersion.put("tasksPlannedForNextWeek", existingReport.getTasksPlannedForNextWeek() != null ? new ArrayList<>(existingReport.getTasksPlannedForNextWeek()) : new ArrayList<>());
+        oldVersion.put("notes", existingReport.getNotes());
+
+        oldVersion.put("savedAt", new Date());
+
+        existingReport.getPreviousVersions().add(oldVersion);
+        existingReport.setCurrentVersion(existingReport.getCurrentVersion() + 1);
+
+        // Update with new data
         existingReport.setProjectId(dto.getProjectId());
         existingReport.setWeekStartDate(dto.getWeekStartDate());
         existingReport.setWeekEndDate(dto.getWeekEndDate());
@@ -155,7 +178,17 @@ public class ReportServiceImpl implements ReportService {
         existingReport.setStatus(dto.getStatus());
         existingReport.setLatestManagerComment(dto.getComment());
 
+        if (dto.getComment() != null && !dto.getComment().trim().isEmpty()) {
+            if (existingReport.getCommentHistory() == null) {
+                existingReport.setCommentHistory(new ArrayList<>());
+            }
+            String historyEntry = new Date().toString() + " - " + dto.getStatus() + ": " + dto.getComment();
+            existingReport.getCommentHistory().add(historyEntry);
+        }
+
         if (dto.getStatus() == ReportStatus.NEEDS_CORRECTION) {
+            // Note: Since currentVersion is also incremented in updateReport, you may remove this line
+            // if you only want the version to bump upon user submission, rather than manager review.
             existingReport.setCurrentVersion(existingReport.getCurrentVersion() + 1);
         }
 
@@ -189,5 +222,24 @@ public class ReportServiceImpl implements ReportService {
         stats.setReportStatusDistribution(distribution);
 
         return stats;
+    }
+
+    @Override
+    public Map<String, Object> getTeamMemberProfile(String userId) {
+        List<Report> reports = reportRepository.findByUserIdOrderByCreatedAtDesc(userId);
+
+        long total = reports.size();
+        long approved = reports.stream().filter(r -> r.getStatus() == ReportStatus.APPROVED).count();
+        long needsCorrection = reports.stream().filter(r -> r.getStatus() == ReportStatus.NEEDS_CORRECTION).count();
+        long pendingReview = reports.stream().filter(r -> r.getStatus() == ReportStatus.SUBMITTED).count();
+
+        Map<String, Object> profileData = new HashMap<>();
+        profileData.put("totalReports", total);
+        profileData.put("approved", approved);
+        profileData.put("needsCorrection", needsCorrection);
+        profileData.put("pendingReview", pendingReview);
+        profileData.put("reports", reports);
+
+        return profileData;
     }
 }

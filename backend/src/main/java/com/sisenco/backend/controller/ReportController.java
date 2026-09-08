@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 /**
  * @author Dusan
@@ -87,5 +88,11 @@ public class ReportController {
     public ResponseEntity<ApiResponse<DashboardStatsDto>> getDashboardStats() {
         DashboardStatsDto stats = reportService.getDashboardStats();
         return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", stats));
+    }
+
+    @GetMapping("/user/{userId}/profile")
+    @PreAuthorize("hasRole('MANAGER')")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getTeamMemberProfile(@PathVariable String userId) {
+        return ResponseEntity.ok(new ApiResponse<>(200, "SUCCESS", reportService.getTeamMemberProfile(userId)));
     }
 }

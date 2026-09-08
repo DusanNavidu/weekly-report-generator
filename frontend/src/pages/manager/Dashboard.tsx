@@ -45,7 +45,7 @@ export default function ManagerDashboard() {
   ].filter(item => item.value > 0);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 max-w-7xl mx-auto">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 max-w-full mx-auto">
       
       <PageHeader 
         title="Dashboard Overview" 

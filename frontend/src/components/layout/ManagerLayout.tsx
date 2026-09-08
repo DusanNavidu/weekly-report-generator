@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTheme } from "../../hooks/useTheme";
-import { LayoutDashboard, Users, FolderOpen, FileText, LogOut, Menu, X, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Users, FolderOpen, FileText, LogOut, Menu, X, Sun, Moon, Columns } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import AIChatWidget from "../manager/AIChatWidget";
 
@@ -19,6 +19,7 @@ export default function ManagerLayout() {
     { name: "Team Members", path: "/manager/members", icon: Users },
     { name: "Projects", path: "/manager/projects", icon: FolderOpen },
     { name: "Reports", path: "/manager/reports", icon: FileText },
+    { name: "Compare Team", path: "/manager/compare", icon: Columns },
   ];
 
   useEffect(() => {

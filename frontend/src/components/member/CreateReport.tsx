@@ -6,8 +6,9 @@ import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { fetchProjects } from "../../store/slices/projectSlice";
 import { submitNewReport } from "../../store/slices/reportSlice";
 import { TaskRecord, IssueRecord, AchievementRecord } from "../../service/report";
-import InputField from "../../components/ui/InputField";
 import PageHeader from "../../components/ui/PageHeader";
+import SelectField from "../../components/ui/SelectField";
+import DatePickerField from "../../components/ui/DatePickerField";
 import TasksSection from "../../components/member/TasksSection";
 import BlockersSection from "../../components/member/BlockersSection";
 import AchievementsSection from "../../components/member/AchievementsSection";
@@ -38,10 +39,12 @@ export default function CreateReport() {
     setIsSubmitting(true);
     try {
       await dispatch(submitNewReport({ projectId, weekStartDate, weekEndDate, tasksCompleted: tasks, tasksPlannedForNextWeek: [], blockers, achievements, notes: "", isSubmit })).unwrap();
-      alert.toast("Report submitted successfully!", "success");
+      alert.toast(`Report ${isSubmit ? "submitted" : "saved as draft"} successfully!`, "success");
       navigate("/member/reports");
     } finally { setIsSubmitting(false); }
   };
+
+  const projectOptions = projects.map(p => ({ value: String(p.id), label: p.name }));
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 max-w-full mx-auto pb-10">
@@ -49,18 +52,12 @@ export default function CreateReport() {
       
       <div className="clay-card p-6 lg:p-8 space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-text-main pl-1">Project / Category</label>
-            <select className="clay-input px-4 py-3 w-full" value={projectId} onChange={(e) => setProjectId(e.target.value)} required>
-              <option value="">Select a Project...</option>
-              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-          </div>
-          <InputField type="date" label="Week Start Date" value={weekStartDate} onChange={(e) => setWeekStartDate(e.target.value)} required />
-          <InputField type="date" label="Week End Date" value={weekEndDate} onChange={(e) => setWeekEndDate(e.target.value)} required />
+          <SelectField label="Project / Category" value={projectId} onChange={setProjectId} options={projectOptions} required />
+          <DatePickerField label="Week Start Date" value={weekStartDate} onChange={setWeekStartDate} required />
+          <DatePickerField label="Week End Date" value={weekEndDate} onChange={setWeekEndDate} required />
         </div>
 
-        <TasksSection tasks={tasks} isEditable={true} onAdd={() => setTasks([...tasks, { taskName: "", priority: "MEDIUM", plannedVsActualPercentage: "", taskStatus: "IN_PROGRESS", plannedVsSpentTime: "", output: "" }])} onRemove={(i) => setTasks(tasks.filter((_, idx) => idx !== i))} onUpdate={(i, f, v) => { const u = [...tasks]; u[i] = { ...u[i], [f]: v }; setTasks(u); }} />
+        <TasksSection tasks={tasks} isEditable={true} onAdd={() => setTasks([...tasks, { taskName: "", priority: "MEDIUM", plannedVsActualPercentage: "100% / 0%", taskStatus: "IN_PROGRESS", plannedVsSpentTime: "0h / 0h", output: "" }])} onRemove={(i) => setTasks(tasks.filter((_, idx) => idx !== i))} onUpdate={(i, f, v) => { const u = [...tasks]; u[i] = { ...u[i], [f]: v }; setTasks(u); }} />
         <BlockersSection blockers={blockers} isEditable={true} onAdd={() => setBlockers([...blockers, { description: "", isKeyIssue: false }])} onRemove={(i) => setBlockers(blockers.filter((_, idx) => idx !== i))} onUpdate={(i, v, k) => { const u = [...blockers]; if(v !== undefined) u[i].description = v; if(k !== undefined) { u.forEach(b => b.isKeyIssue = false); u[i].isKeyIssue = k; } setBlockers(u); }} />
         <AchievementsSection achievements={achievements} isEditable={true} onAdd={() => setAchievements([...achievements, { description: "", isKeyAchievement: false }])} onRemove={(i) => setAchievements(achievements.filter((_, idx) => idx !== i))} onUpdate={(i, v, k) => { const u = [...achievements]; if(v !== undefined) u[i].description = v; if(k !== undefined) { u.forEach(a => a.isKeyAchievement = false); u[i].isKeyAchievement = k; } setAchievements(u); }} />
 

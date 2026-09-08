@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @author Dusan
  * @date 9/6/2026
@@ -16,4 +18,5 @@ import org.springframework.stereotype.Repository;
 public interface ReportRepository extends MongoRepository<Report, String> {
     Page<Report> findByUserId(String userId, Pageable pageable);
     long countByStatus(ReportStatus status);
+    List<Report> findByUserIdOrderByCreatedAtDesc(String userId);
 }

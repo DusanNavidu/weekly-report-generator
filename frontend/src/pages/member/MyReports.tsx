@@ -21,7 +21,7 @@ export default function MyReports() {
   }, [dispatch, page, projects.length]);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-5xl mx-auto">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 max-w-full mx-auto">
       <PageHeader title="My Weekly Reports" description="View your submission history and current statuses.">
         <Link to="/member/reports/new" className="clay-btn px-6 py-3 flex items-center justify-center gap-2 font-semibold">
           <Plus size={20} /><span>New Report</span>

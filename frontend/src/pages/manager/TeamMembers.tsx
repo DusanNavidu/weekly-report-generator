@@ -9,7 +9,7 @@ import { removeTeamMember } from "../../service/manager";
 import { useAlert } from "../../hooks/useAlert";
 
 export default function TeamMembers() {
-    
+
     const alert = useAlert();
     const [data, setData] = useState<PaginatedResponse<UserDTO>>({
         content: [], currentPage: 0, totalPages: 0, totalElements: 0
@@ -38,16 +38,18 @@ export default function TeamMembers() {
     };
 
     const handleRemoveMember = async (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to remove ${name} from the team?`)) {
-      try {
-        await removeTeamMember(id);
-        alert.toast("Member removed successfully!", "success");
-        fetchMembers(page);
-      } catch (error) {
-        alert.showError("Failed to remove member", "Something went wrong. Please try again.");
-      }
-    }
-  };
+        alert.confirmAction("Remove Member", `Are you sure you want to remove ${name}?`, "Remove", "Cancel").then(async (result) => {
+            if (result) {
+                try {
+                    await removeTeamMember(id);
+                    alert.showSuccess("Member removed successfully!");
+                    fetchMembers(page);
+                } catch (error) {
+                    alert.showError("Failed to remove member", "Something went wrong. Please try again.");
+                }
+            }
+        });
+    };
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">

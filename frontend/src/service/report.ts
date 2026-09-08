@@ -94,3 +94,8 @@ export const getDashboardStatsAPI = async () => {
   const response = await api.get('/reports/dashboard-stats');
   return response.data.data;
 };
+
+export const getTeamMemberProfileAPI = async (userId: string) => {
+  const response = await api.get(`/reports/user/${userId}/profile`);
+  return response.data.data;
+};
