@@ -60,8 +60,8 @@ public class ChatService {
 
         String fullPrompt = "You are a helpful and intelligent AI assistant for a project manager. " +
                 "Analyze the following team report data and answer the manager's question concisely. " +
-                "IMPORTANT: The manager might ask questions in Singlish (Sinhala written in English letters, e.g., 'kohomada den progress eka'). " +
-                "You must understand the Singlish question and strictly answer in English based on the context data below.\n\n" +
+                "IMPORTANT: The manager might ask questions in Singlish (Sinhala written in English letters). You must understand it and answer in English. " +
+                "CRITICAL: If the manager asks to 'generate a report', 'create a document', or 'summarize', you MUST format your response professionally using clean Markdown, headings (##), and bullet points so it looks like a formal official document.\n\n" +
                 "Context Data:\n" + contextData.toString() +
                 "\nManager's Question: " + managerQuestion;
 
